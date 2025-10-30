@@ -63,6 +63,10 @@
         return str.substring(str.length-2);        
     }
 
+    function formatTime(hour, minute, second) {
+        return decS2(hour) + ":" + dec02(minute) + ":" + dec02(second);
+    }
+
     var debug = false;
     // Statusがクリックされた時の処理
     function setDebugMode(e){
@@ -91,9 +95,7 @@
         ctx.stroke();        
     }
 
-    function formatTime(hour, minute, second) {
-        return decS2(hour) + ":" + dec02(minute) + ":" + dec02(second);
-    }
+    
     
     // 時計 clock(時, 分, 秒, 残り時間が短い時に不要な針を隠す)
     function clock(hour,minute,second,hide){
@@ -168,6 +170,7 @@
         $('#btnA').prop('disabled', false);
         $('#btnB').prop('disabled', false);
         $('#btnC').prop('disabled', false);
+       // btnCClick(null);
 
         $("#minute").css("font-family","fantasy"); 
         $("#second").css("font-family","fantasy"); 
@@ -202,15 +205,17 @@
     function btnAClick(e){
         active = true;
         startTime = new Date();
+        $("#btnA").prop("disabled" , true);
+        $("#btnB").prop("disabled" , false);
+      
 
-       
-    
     }
 
     // ButtonBがクリックされた時の処理
     function btnBClick(e){
         active = false;
-       
+        $("#btnA").prop("disabled" , false);
+        $("#btnB").prop("disabled" , true); 
         
         
     }
@@ -222,7 +227,10 @@
         period = 60* parseInt( $("#minute").val() ) + parseInt( $("#second").val() );
         $("#time").html("経過時間： 0");
         $("#remain").html("残り時間： " + period );
-        
+        $("#btnA").prop("disabled" , false);
+        $("#btnB").prop("disabled" , true); 
+        $("body").css("backgroundColor", "skyblue");
+
 
     }
     
@@ -237,15 +245,25 @@
         $("#clock").html(formatTime(hour,minute,second));
 
         if (active){ 
-            etime = parseInt( (new Date() - startTime)/1000 );
-            rest = period - etime;
-            var m = psrseInt(rest/60);
+            var time = parseInt( (new Date() - startTime)/1000 );
+            var rest = period - time;
+            var m = parseInt(rest/60);
             var s = parseInt(rest - m*60);
-            $("#time").html("経過時間： " + etime);
-            $("#remain").html("残り時間： " + rest + "(" + m + ":" + s + ")" );
-            analog(rest);
+            $("#time").html("経過時間： " + time);
+            $("#remain").html("残り時間： " + rest + "(" + m + ":" + s + ")");
 
+            var mstr = "分: " ;
+            var sstr = "秒: " ;
+            for(var i = 0; i < m; i++){
+                mstr += "〇";
+            }
+            for(var i = 0; i < s; i++){
+                sstr += "〇";
+            }        
+             $("#minuteStr").html(mstr);
+             $("#secondStr").html(sstr);
             
+            analog(rest);
             if(rest <= 0){
                 active = false;
                 alarm();
@@ -254,8 +272,13 @@
                 active = true;
                 alarm();
             }
+            if(rest <= 60){
+                $("body").css("backgroundColor", "pink");
+            }    
+           
         }
     }
+
   
   </script>
 </head>
