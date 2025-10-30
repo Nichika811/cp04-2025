@@ -89,7 +89,12 @@
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
         ctx.stroke();        
-    }    
+    }
+
+    function formatTime(hour, minute, second) {
+        return decS2(hour) + ":" + dec02(minute) + ":" + dec02(second);
+    }
+    
     // 時計 clock(時, 分, 秒, 残り時間が短い時に不要な針を隠す)
     function clock(hour,minute,second,hide){
         var canvas = $('#mycanvas')[0];
@@ -166,6 +171,11 @@
 
         $("#minute").css("font-family","fantasy"); 
         $("#second").css("font-family","fantasy"); 
+        $("#clock").css("font-family","fantasy");
+        $("#btnA").css("font-family","Arial Black"); 
+        $("#btnB").css("font-family","Arial Black");
+        $("#btnC").css("font-family","Arial Black");
+    
     
     
         
@@ -219,16 +229,29 @@
  
     // 繰り返し実行する処理
     function timer(){
+        var date = new Date();
+        var hour = date.getHours();
+        var minute = date.getMinutes();
+        var second = date.getSeconds();
+
+        $("#clock").html(formatTime(hour,minute,second));
+
         if (active){ 
             etime = parseInt( (new Date() - startTime)/1000 );
             rest = period - etime;
+            var m = psrseInt(rest/60);
+            var s = parseInt(rest - m*60);
             $("#time").html("経過時間： " + etime);
-            $("#remain").html("残り時間： " + rest  );
+            $("#remain").html("残り時間： " + rest + "(" + m + ":" + s + ")" );
             analog(rest);
 
             
             if(rest <= 0){
                 active = false;
+                alarm();
+            }
+            if(rest == 60){
+                active = true;
                 alarm();
             }
         }
@@ -244,10 +267,12 @@
 
     <div id="remain">Remaining time</div>
     <div id="time">Time</div>
+
+    <div id="clock">clock</div>
     <button id="btnA">Start</button>  
     <button id="btnB">Stop</button>  
     <button id="btnC">Set</button>  
-    <input type="number" id="minute" value=0 >
-    <input type="number" id="second" value=15 >
+    <input type="number" id="minute" value=3 >
+    <input type="number" id="second" value=0 >
 </body>
 </html>
